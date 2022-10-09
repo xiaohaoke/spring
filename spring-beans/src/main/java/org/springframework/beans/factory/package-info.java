@@ -1,4 +1,5 @@
 /**
+ * 实现Spring的轻量级控制反转 (IoC) 容器的核心包。
  * The core package implementing Spring's lightweight Inversion of Control (IoC) container.
  *
  * <p>Provides an alternative to the Singleton and Prototype design

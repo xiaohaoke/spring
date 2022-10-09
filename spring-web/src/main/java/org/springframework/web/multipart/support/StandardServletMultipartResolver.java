@@ -65,6 +65,9 @@ import org.springframework.web.multipart.MultipartResolver;
  */
 public class StandardServletMultipartResolver implements MultipartResolver {
 
+	/**
+	 * 是否延迟加载
+	 */
 	private boolean resolveLazily = false;
 
 	private boolean strictServletCompliance = false;
@@ -103,6 +106,7 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 
 	@Override
 	public boolean isMultipart(HttpServletRequest request) {
+		// 请求的 Content-type 必须 multipart/ 开头
 		return StringUtils.startsWithIgnoreCase(request.getContentType(),
 				(this.strictServletCompliance ? MediaType.MULTIPART_FORM_DATA_VALUE : "multipart/"));
 	}
@@ -118,6 +122,7 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 				((AbstractMultipartHttpServletRequest) request).isResolved()) {
 			// To be on the safe side: explicitly delete the parts,
 			// but only actual file parts (for Resin compatibility)
+			//清理资源，删除临时的 javax.servlet.http.Part 们
 			try {
 				for (Part part : request.getParts()) {
 					if (request.getFile(part.getName()) != null) {

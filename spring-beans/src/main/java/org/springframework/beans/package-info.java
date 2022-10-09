@@ -1,4 +1,5 @@
 /**
+ * 该包包含用于操作Java bean的接口和类。
  * This package contains interfaces and classes for manipulating Java beans.
  * It is used by most other Spring packages.
  *

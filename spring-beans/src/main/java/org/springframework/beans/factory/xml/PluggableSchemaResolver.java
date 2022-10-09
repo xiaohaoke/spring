@@ -113,6 +113,9 @@ public class PluggableSchemaResolver implements EntityResolver {
 		}
 
 		if (systemId != null) {
+			//首先调用 getSchemaMappings() 获取一个映射表(systemId 与其在本地的对照关系)，
+			// 然后根据传入的 systemId 获取该 systemId 在本地的路径 resourceLocation，
+			// 最后根据 resourceLocation 构造 InputSource 对象。 映射表如下（部分）:
 			String resourceLocation = getSchemaMappings().get(systemId);
 			if (resourceLocation == null && systemId.startsWith("https:")) {
 				// Retrieve canonical http schema mapping even for https declaration

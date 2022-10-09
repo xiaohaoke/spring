@@ -26,6 +26,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * AttributeAccessorSupport 是接口 AttributeAccessor 的实现者。
+ * AttributeAccessor 接口定义了与其他对象的元数据进行连接和访问的约定，可以通过该接口对属性进行获取、设置、删除操作。
+ * 设置元数据后，则可以通过 getAttribute()
  * Support class for {@link AttributeAccessor AttributeAccessors}, providing
  * a base implementation of all methods. To be extended by subclasses.
  *

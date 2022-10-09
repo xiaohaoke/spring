@@ -45,6 +45,7 @@ public abstract class BeanDefinitionReaderUtils {
 
 
 	/**
+	 * 该方法主要是设置parentName 、className、classLoader。
 	 * Create a new GenericBeanDefinition for the given parent name and class name,
 	 * eagerly loading the bean class if a ClassLoader has been specified.
 	 * @param parentName the name of the parent bean, if any
@@ -158,11 +159,12 @@ public abstract class BeanDefinitionReaderUtils {
 	public static void registerBeanDefinition(
 			BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)
 			throws BeanDefinitionStoreException {
-
+		//注册beanName
 		// Register bean definition under primary name.
 		String beanName = definitionHolder.getBeanName();
+		//首先通过BeanName注册BeanDefinition
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
-
+		//注册alias别名
 		// Register aliases for bean name, if any.
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {

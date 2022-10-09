@@ -44,6 +44,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public abstract class AbstractMultipartHttpServletRequest extends HttpServletRequestWrapper
 		implements MultipartHttpServletRequest {
 
+	/**
+	 * 请求中的文件信息
+	 */
 	@Nullable
 	private MultiValueMap<String, MultipartFile> multipartFiles;
 
@@ -67,6 +70,7 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 		return HttpMethod.valueOf(getRequest().getMethod());
 	}
 
+	/** 获取请求头信息 */
 	@Override
 	public HttpHeaders getRequestHeaders() {
 		HttpHeaders headers = new HttpHeaders();
@@ -78,16 +82,19 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 		return headers;
 	}
 
+	/** 获取文件名称列表 */
 	@Override
 	public Iterator<String> getFileNames() {
 		return getMultipartFiles().keySet().iterator();
 	}
 
+	/** 获取指定文件名的单个文件 */
 	@Override
 	public MultipartFile getFile(String name) {
 		return getMultipartFiles().getFirst(name);
 	}
 
+	/** 获取指定文件名的多个文件 */
 	@Override
 	public List<MultipartFile> getFiles(String name) {
 		List<MultipartFile> multipartFiles = getMultipartFiles().get(name);
@@ -144,6 +151,7 @@ public abstract class AbstractMultipartHttpServletRequest extends HttpServletReq
 	}
 
 	/**
+	 * 交由子类实现
 	 * Lazily initialize the multipart request, if possible.
 	 * Only called if not already eagerly initialized.
 	 */

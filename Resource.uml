@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.core.io.Resource</OriginalElement>
+  <nodes>
+    <node x="902.3599033816427" y="105.16304347826087">org.springframework.core.io.AbstractResource</node>
+    <node x="891.3599033816428" y="-96.09299516908214">org.springframework.core.io.InputStreamSource</node>
+    <node x="488.77642021924487" y="270.81364190012187">org.springframework.core.io.FileSystemResource</node>
+    <node x="940.8599033816428" y="-1.3121980676328349">org.springframework.core.io.Resource</node>
+    <node x="853.5017336287196" y="270.81364190012187">org.springframework.core.io.ClassPathResource</node>
+    <node x="1610.6038647342993" y="270.81364190012187">org.springframework.core.io.InputStreamResource</node>
+    <node x="1329.7222222222224" y="270.81364190012187">org.springframework.core.io.ByteArrayResource</node>
+    <node x="1215.8683574879228" y="105.16304347826087">org.springframework.core.io.ContextResource</node>
+    <node x="1152.6630434782605" y="283.5129172624406">org.springframework.core.io.UrlResource</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.core.io.Resource" target="org.springframework.core.io.InputStreamSource" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-16.0" />
+      <point x="0.0" y="16.0" />
+    </edge>
+    <edge source="org.springframework.core.io.FileSystemResource" target="org.springframework.core.io.Resource" relationship="REALIZATION">
+      <point x="123.99957978075508" y="4.515525428132605E-4" />
+      <point x="561.7874396135265" y="286.8140934526647" />
+      <point x="561.7874396135265" y="14.688" />
+      <point x="-68.99990338164275" y="1.9806763283547468E-4" />
+    </edge>
+    <edge source="org.springframework.core.io.ByteArrayResource" target="org.springframework.core.io.AbstractResource" relationship="GENERALIZATION">
+      <point x="0.0" y="-15.999641900121844" />
+      <point x="1448.2222222222224" y="195.0" />
+      <point x="1015.36" y="195.0" />
+      <point x="9.661835736096691E-5" y="15.999956521739136" />
+    </edge>
+    <edge source="org.springframework.core.io.ClassPathResource" target="org.springframework.core.io.AbstractResource" relationship="GENERALIZATION">
+      <point x="4.7893166697576817E-4" y="-15.999548447457215" />
+      <point x="972.0022125603866" y="286.81364190012187" />
+      <point x="908.5058357487925" y="286.81364190012187" />
+      <point x="908.5058357487925" y="195.0" />
+      <point x="1015.36" y="195.0" />
+      <point x="9.661835736096691E-5" y="15.999956521739136" />
+    </edge>
+    <edge source="org.springframework.core.io.FileSystemResource" target="org.springframework.core.io.AbstractResource" relationship="GENERALIZATION">
+      <point x="-4.202192449156428E-4" y="-15.999548447457215" />
+      <point x="612.776" y="167.06159420289856" />
+      <point x="1015.36" y="167.06159420289856" />
+      <point x="9.661835736096691E-5" y="15.999956521739136" />
+    </edge>
+    <edge source="org.springframework.core.io.InputStreamResource" target="org.springframework.core.io.AbstractResource" relationship="GENERALIZATION">
+      <point x="1.3526570069188892E-4" y="-15.999641900121844" />
+      <point x="1740.104" y="169.6014492753623" />
+      <point x="1015.3599033816427" y="169.6014492753623" />
+      <point x="1015.3599033816427" y="158.5954106280193" />
+      <point x="1015.36" y="158.5954106280193" />
+      <point x="9.661835736096691E-5" y="15.999956521739136" />
+    </edge>
+    <edge source="org.springframework.core.io.AbstractResource" target="org.springframework.core.io.Resource" relationship="REALIZATION">
+      <point x="-112.99990338164264" y="-4.347826087780504E-5" />
+      <point x="1002.0289855072464" y="121.163" />
+      <point x="1002.0289855072464" y="14.688" />
+      <point x="-68.99990338164275" y="1.9806763283547468E-4" />
+    </edge>
+    <edge source="org.springframework.core.io.ContextResource" target="org.springframework.core.io.Resource" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-16.0" />
+      <point x="1323.3683574879228" y="14.687801932367165" />
+      <point x="68.99999999999989" y="0.0" />
+    </edge>
+    <edge source="org.springframework.core.io.UrlResource" target="org.springframework.core.io.AbstractResource" relationship="GENERALIZATION">
+      <point x="6.763285023225762E-5" y="-15.999641900121844" />
+      <point x="1238.1631111111108" y="227.17149758454104" />
+      <point x="1015.36" y="227.17149758454104" />
+      <point x="9.661835736096691E-5" y="15.999956521739136" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.181169757489301" showDependencies="false" x="1101.798309178744" y="113.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -31,6 +31,9 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * ResourceLoader 的默认实现，它接收 ClassLoader 作为构造函数的参数或者使用不带参数的构造函数，
+ * 在使用不带参数的构造函数时，使用的 ClassLoader 为默认的 ClassLoader（一般为Thread.currentThread().getContextClassLoader()），
+ * 可以通过 ClassUtils.getDefaultClassLoader()获取。当然也可以调用 setClassLoader()方法进行后续设置。
  * Default implementation of the {@link ResourceLoader} interface.
  *
  * <p>Used by {@link ResourceEditor}, and serves as base class for
@@ -145,7 +148,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	@Override
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
-
+		//首先通过ProtocolResolver来加载资源，成功返回resource，否则调用下面逻辑
 		for (ProtocolResolver protocolResolver : getProtocolResolvers()) {
 			Resource resource = protocolResolver.resolve(location, this);
 			if (resource != null) {
