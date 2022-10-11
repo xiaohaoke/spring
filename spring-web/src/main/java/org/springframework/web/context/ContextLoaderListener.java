@@ -20,6 +20,8 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
 /**
+ * 实现了 Servlet 的 javax.servlet.ServletContextListener 接口，能够监听 ServletContext 对象的生命周期，也就是监听 Web 应用的生命周期，当 Servlet 容器启动或者销毁时，会触发相应的 ServletContextEvent 事件，ContextLoaderListener 监听到启动事件，则会初始化一个Root Spring WebApplicationContext 容器，监听到销毁事件，则会销毁该容器
+ * org.springframework.web.servlet.DispatcherServlet 对象，它继承了 javax.servlet.http.HttpServlet 抽象类，也就是一个 Servlet。Spring MVC 的核心类，处理请求，会初始化一个属于它的 Spring WebApplicationContext 容器，并且这个容器是以 该 Root 容器作为父容器
  * Bootstrap listener to start up and shut down Spring's root {@link WebApplicationContext}.
  * Simply delegates to {@link ContextLoader} as well as to {@link ContextCleanupListener}.
  *
@@ -99,6 +101,7 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
+		// <1> 初始化 Root WebApplicationContext。监听到 Servlet 容器启动事件，则调用父类 ContextLoader 的 initWebApplicationContext(ServletContext servletContext) 方法，初始化 WebApplicationContext 容器
 		initWebApplicationContext(event.getServletContext());
 	}
 
@@ -108,6 +111,7 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
+		//监听到 Servlet 销毁启动事件，则调用父类 ContextLoader 的 closeWebApplicationContext(ServletContext servletContext) 方法，销毁 WebApplicationContext 容器
 		closeWebApplicationContext(event.getServletContext());
 		ContextCleanupListener.cleanupAttributes(event.getServletContext());
 	}
