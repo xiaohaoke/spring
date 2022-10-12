@@ -600,16 +600,20 @@ public class DispatcherServlet extends FrameworkServlet {
 	private void initHandlerMappings(ApplicationContext context) {
 		this.handlerMappings = null;
 
+		// <1> 如果开启探测功能，则扫描已注册的 HandlerMapping 的 Bean 们，添加到 handlerMappings 中,默认开启
 		if (this.detectAllHandlerMappings) {
 			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
+			// 扫描已注册的 HandlerMapping 的 Bean 们
 			Map<String, HandlerMapping> matchingBeans =
 					BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerMapping.class, true, false);
+			// 添加到 handlerMappings 中，并进行排序
 			if (!matchingBeans.isEmpty()) {
 				this.handlerMappings = new ArrayList<>(matchingBeans.values());
 				// We keep HandlerMappings in sorted order.
 				AnnotationAwareOrderComparator.sort(this.handlerMappings);
 			}
 		}
+		// <2> 如果关闭探测功能，则获得 Bean 名称为 "handlerMapping" 对应的 Bean ，将其添加至 handlerMappings
 		else {
 			try {
 				HandlerMapping hm = context.getBean(HANDLER_MAPPING_BEAN_NAME, HandlerMapping.class);
@@ -620,6 +624,8 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
+		// <3> 如果未获得到，则获得默认配置的 HandlerMapping 类，调用 getDefaultStrategies(ApplicationContext context, Class<T> strategyInterface) 方法，
+		// 就是从 DispatcherServlet.properties 文件中读取 HandlerMapping 的默认实现类
 		// Ensure we have at least one HandlerMapping, by registering
 		// a default HandlerMapping if no other mappings are found.
 		if (this.handlerMappings == null) {
@@ -978,7 +984,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 
 		try {
-			// <5> 执行请求的分发
+			// <5> 执行请求的分发(重点)
 			doDispatch(request, response);
 		}
 		finally {

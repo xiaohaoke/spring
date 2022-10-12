@@ -6,8 +6,8 @@
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Logger name="org.springframework.web.servlet" level="warn" />
-		<Logger name="org.springframework.convert" level="warn" />
+		<Logger name="org.springframework.web.servlet" level="debug" />
+		<Logger name="org.springframework.convert" level="debug" />
 		<Root level="error">
 			<AppenderRef ref="Console" />
 		</Root>

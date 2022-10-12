@@ -34,13 +34,22 @@ import org.springframework.web.util.pattern.PathPattern;
  */
 public class RequestMatchResult {
 
+	/**
+	 * 匹配到的路径
+	 */
 	@Nullable
 	private final PathPattern pathPattern;
 
+	/**
+	 * 被匹配的路径
+	 */
 	@Nullable
 	private final PathContainer lookupPathContainer;
 
 
+	/**
+	 * 路径匹配器
+	 */
 	@Nullable
 	private final String pattern;
 

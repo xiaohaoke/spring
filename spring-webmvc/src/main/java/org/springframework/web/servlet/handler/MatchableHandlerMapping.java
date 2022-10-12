@@ -34,6 +34,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 public interface MatchableHandlerMapping extends HandlerMapping {
 
 	/**
+	 * 判断请求和指定 pattern 路径是否匹配
 	 * Return the parser of this {@code HandlerMapping}, if configured in which
 	 * case pre-parsed patterns are used.
 	 * @since 5.3

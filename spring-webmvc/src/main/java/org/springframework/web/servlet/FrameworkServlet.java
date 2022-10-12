@@ -968,6 +968,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	/**
+	 * 使用场景：AJAX 进行跨域请求时的预检，需要向另外一个域名的资源发送一个HTTP OPTIONS请求头，用以判断实际发送的请求是否安全
 	 * Delegate OPTIONS requests to {@link #processRequest}, if desired.
 	 * <p>Applies HttpServlet's standard OPTIONS processing otherwise,
 	 * and also if there is still no 'Allow' header set after dispatching.
@@ -1017,6 +1018,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 				return;
 			}
 		}
+		// 调用父方法
 		super.doTrace(request, response);
 	}
 
@@ -1032,20 +1034,23 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 		// <2> 记录异常，用于保存处理请求过程中发送的异常
 		Throwable failureCause = null;
-
+		//获取之前的位置信息，最后finally时恢复之前配置
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
 		LocaleContext localeContext = buildLocaleContext(request);
-
+		//注册Interceptor
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
 
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
-
+		//将请求中的位置信息记入
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
-			// <7> 执行真正的逻辑
+			// <7> 执行真正的逻辑,【核心】调用 doService(HttpServletRequest request, HttpServletResponse response) 抽象方法，
+			// 执行真正的逻辑，由 DispatcherServlet 实现，
+			// 所以这就是 DispatcherServlet 处理请求的真正入口【核心】调用 doService(HttpServletRequest request, HttpServletResponse response) 抽象方法，
+			// 执行真正的逻辑，由 DispatcherServlet 实现，所以这就是 DispatcherServlet 处理请求的真正入口
 			doService(request, response);
 		}
 		catch (ServletException | IOException ex) {

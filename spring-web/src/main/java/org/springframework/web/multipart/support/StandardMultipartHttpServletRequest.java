@@ -222,6 +222,8 @@ public class StandardMultipartHttpServletRequest extends AbstractMultipartHttpSe
 
 
 	/**
+	 * 这个类封装了 Servlet 3.0 的 Part 对象，也就是我们常用到的 MultipartFile 对象，
+	 * 支持对文件的操作，内部其实都是调用 javax.servlet.http.Part 的方法
 	 * Spring MultipartFile adapter, wrapping a Servlet Part object.
 	 */
 	@SuppressWarnings("serial")
