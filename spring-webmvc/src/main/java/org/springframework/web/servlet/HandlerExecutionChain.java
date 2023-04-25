@@ -41,10 +41,22 @@ public class HandlerExecutionChain {
 
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
+
+	/**
+	 * 处理器
+	 */
 	private final Object handler;
 
+	/**
+	 * 拦截器数组
+	 */
 	private final List<HandlerInterceptor> interceptorList = new ArrayList<>();
 
+	/**
+	 * 已成功执行 {@link HandlerInterceptor#preHandle(HttpServletRequest, HttpServletResponse, Object)} 的位置
+	 *记录已成功执行前置处理的拦截器位置，因为已完成处理只会执行前置处理成功的拦截器，且倒序执行
+	 * 在 {@link #applyPostHandle} 和 {@link #triggerAfterCompletion} 方法中需要用到，用于倒序执行拦截器的方法
+	 */
 	private int interceptorIndex = -1;
 
 
@@ -76,6 +88,9 @@ public class HandlerExecutionChain {
 	public HandlerExecutionChain(Object handler, List<HandlerInterceptor> interceptorList) {
 		if (handler instanceof HandlerExecutionChain originalChain) {
 			this.handler = originalChain.getHandler();
+			// 将原始的 HandlerExecutionChain 的 interceptors 复制到 this.interceptorList 中
+			//将入参的 interceptors 合并到 this.interceptorList 中
+			// todo  why
 			this.interceptorList.addAll(originalChain.interceptorList);
 		}
 		else {
@@ -135,6 +150,7 @@ public class HandlerExecutionChain {
 
 
 	/**
+	 * 执行请求匹配的拦截器的前置处理
 	 * Apply preHandle methods of registered interceptors.
 	 * @return {@code true} if the execution chain should proceed with the
 	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
@@ -142,29 +158,39 @@ public class HandlerExecutionChain {
 	 */
 	boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		for (int i = 0; i < this.interceptorList.size(); i++) {
+			// <2> 遍历拦截器数组
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
+			// <3> 前置处理
 			if (!interceptor.preHandle(request, response, this.handler)) {
+				// <3.1> 已完成处理 拦截器
 				triggerAfterCompletion(request, response, null);
+				// 返回 false ，前置处理失败
 				return false;
 			}
+			// <3.2> 标记 interceptorIndex 位置成功执行前置处理的拦截器的位置
 			this.interceptorIndex = i;
 		}
+		// <4> 返回 true ，前置处理成功
 		return true;
 	}
 
 	/**
+	 * 请求匹配的拦截器的后置处理是倒序执行的
+	 * 如果前置处理没有全部执行成功，或者处理请求的过程中出现异常是不会调用该方法的，也就是不会执行后置处理
 	 * Apply postHandle methods of registered interceptors.
 	 */
 	void applyPostHandle(HttpServletRequest request, HttpServletResponse response, @Nullable ModelAndView mv)
 			throws Exception {
-
+		//遍历拦截器数组
 		for (int i = this.interceptorList.size() - 1; i >= 0; i--) {
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
+			//后置处理
 			interceptor.postHandle(request, response, this.handler, mv);
 		}
 	}
 
 	/**
+	 * 触发拦截器们的已完成处理，最后返回 false
 	 * Trigger afterCompletion callbacks on the mapped HandlerInterceptors.
 	 * Will just invoke afterCompletion for all interceptors whose preHandle invocation
 	 * has successfully completed and returned true.
@@ -173,6 +199,7 @@ public class HandlerExecutionChain {
 		for (int i = this.interceptorIndex; i >= 0; i--) {
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
 			try {
+				//已完成处理，拦截器
 				interceptor.afterCompletion(request, response, this.handler, ex);
 			}
 			catch (Throwable ex2) {

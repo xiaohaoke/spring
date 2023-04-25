@@ -1034,14 +1034,18 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 		// <2> 记录异常，用于保存处理请求过程中发送的异常
 		Throwable failureCause = null;
-		//获取之前的位置信息，最后finally时恢复之前配置
+		//获取之前的位置信息，最后finally时恢复之前配置，//拿到之前的LocaleContext上下文（因为可能在Filter里已经设置过了）
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+		// 以当前的request创建一个Local的上下文，后面会继续处理
 		LocaleContext localeContext = buildLocaleContext(request);
 		//注册Interceptor
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
+		// 这里面build逻辑注意：previousAttributes若为null，或者就是ServletRequestAttributes类型，那就new ServletRequestAttributes(request, response);
+		// 若不为null，就保持之前的绑定结果，不再做重复绑定了（尊重原创）
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
-
+		// 拿到异步管理器。这里是首次获取，会new WebAsyncManager(),然后放到request的attr里面
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+		//这里需要注意：给异步上下文恒定注册了RequestBindingInterceptor这个拦截器（作用：绑定当前的request、response、local等）
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
 		//将请求中的位置信息记入
 		initContextHolders(request, localeContext, requestAttributes);
@@ -1051,6 +1055,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			// 执行真正的逻辑，由 DispatcherServlet 实现，
 			// 所以这就是 DispatcherServlet 处理请求的真正入口【核心】调用 doService(HttpServletRequest request, HttpServletResponse response) 抽象方法，
 			// 执行真正的逻辑，由 DispatcherServlet 实现，所以这就是 DispatcherServlet 处理请求的真正入口
+			//模版设计模式，由子类实现
 			doService(request, response);
 		}
 		catch (ServletException | IOException ex) {
@@ -1069,7 +1074,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			}
 			// <11> 如果日志级别为 DEBUG，则打印请求日志
 			logResult(request, response, failureCause, asyncManager);
-			// <12> 发布 ServletRequestHandledEvent 请求处理完成事件
+			// <12> 发布 ServletRequestHandledEvent 请求处理完成事件，//关键：不管执行成功与否，都会发布一个事件，说我处理了这个请求（有需要监听的，就可以监听这个事件了，每次请求都会有）
 			publishRequestHandledEvent(request, response, startTime, failureCause);
 		}
 	}

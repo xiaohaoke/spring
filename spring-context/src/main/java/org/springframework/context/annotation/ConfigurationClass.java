@@ -49,20 +49,22 @@ import org.springframework.util.ClassUtils;
  */
 final class ConfigurationClass {
 
+	// 配置类的注解信息
 	private final AnnotationMetadata metadata;
+
 
 	private final Resource resource;
 
 	@Nullable
 	private String beanName;
-
+	// 当前类是哪个配置类导入的
 	private final Set<ConfigurationClass> importedBy = new LinkedHashSet<>(1);
-
+	// 这个配置类中被@Bean注解标记的方法
 	private final Set<BeanMethod> beanMethods = new LinkedHashSet<>();
-
+	// 配置类上的@ImportResource 注解中的消息，配置文件地址-对应处理器Class
 	private final Map<String, Class<? extends BeanDefinitionReader>> importedResources =
 			new LinkedHashMap<>();
-
+	// 配置类上的@Import 注解导入的类，如果是实现了ImportBeanDefinitionRegistrar接口，将会封装到这里
 	private final Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars =
 			new LinkedHashMap<>();
 
@@ -242,6 +244,7 @@ final class ConfigurationClass {
 				getMetadata().getClassName().equals(((ConfigurationClass) other).getMetadata().getClassName())));
 	}
 
+	// 这里重新了equals和hashCode方法，只要配置类的全类名相等这边就认为两个对象一致了
 	@Override
 	public int hashCode() {
 		return getMetadata().getClassName().hashCode();

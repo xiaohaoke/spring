@@ -123,22 +123,29 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 		if (handlerOrClassName == null) {
 			return null;
 		}
+		//如果handlerOrClassName是一个NameSpaceHandler对象，则直接返回--拿到对应的Handler
 		else if (handlerOrClassName instanceof NamespaceHandler) {
 			//如果已经做过解析，直接返回
 			return (NamespaceHandler) handlerOrClassName;
 		}
 		else {
+			//如果handlerOrClassName不是NameSpaceHandler对象，则是String对象
 			String className = (String) handlerOrClassName;
 			try {
+				//通过String对象获取到一个Class对象，那么这个String对象肯定是一个类的全限定名
 				Class<?> handlerClass = ClassUtils.forName(className, this.classLoader);
+				//// handlerClass必须继承自NamespaceHandler，很好理解，毕竟是spring提供的拓展点，自然需要符合它定义的规则
 				if (!NamespaceHandler.class.isAssignableFrom(handlerClass)) {
 					throw new FatalBeanException("Class [" + className + "] for namespace [" + namespaceUri +
 							"] does not implement the [" + NamespaceHandler.class.getName() + "] interface");
 				}
 				//初始化类
+				//直接通过反射构造了一个实例，调用的是无参构造
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
 				//调用init()方法
 				namespaceHandler.init();
+				// !!! 把handler对象塞回了handlerMappings，所以我们下次再通过namespaceUri获取时，会直接拿到一个NamespaceHandler对象
+				// 也即每个namespaceUri对应的NamespaceHandler对象是单例的，而init()方法也只会调用一次
 				handlerMappings.put(namespaceUri, namespaceHandler);
 				//记录在缓存中
 				return namespaceHandler;
@@ -162,19 +169,25 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 		if (handlerMappings == null) {
 			synchronized (this) {
 				handlerMappings = this.handlerMappings;
+				// 双重检查加锁，看来我们的handlerMappings之后加载一次
 				if (handlerMappings == null) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("Loading NamespaceHandler mappings from [" + this.handlerMappingsLocation + "]");
 					}
 					try {
+						// 可以看到这边是去加载了文件
+						// 文件加载的过程我们就不去跟了，跟主流程关系不大，我们主要看一下这个文件位置
+						// this.handlerMappingsLocation是哪里
 						Properties mappings =
 								PropertiesLoaderUtils.loadAllProperties(this.handlerMappingsLocation, this.classLoader);
 						if (logger.isTraceEnabled()) {
 							logger.trace("Loaded NamespaceHandler mappings: " + mappings);
 						}
 						handlerMappings = new ConcurrentHashMap<>(mappings.size());
+						// 然后把文件中的kev-value属性都合并到了一个map里
 						CollectionUtils.mergePropertiesIntoMap(mappings, handlerMappings);
 						this.handlerMappings = handlerMappings;
+						// 干掉了异常处理代码
 					}
 					catch (IOException ex) {
 						throw new IllegalStateException(

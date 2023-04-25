@@ -3,6 +3,7 @@ pluginManagement {
 		mavenCentral()
 		gradlePluginPortal()
 		maven { url "https://repo.spring.io/release" }
+		maven { url "https://maven.aliyun.com/repository/public" }
 	}
 }
 
@@ -30,6 +31,7 @@ include "spring-messaging"
 include "spring-orm"
 include "spring-oxm"
 include "spring-r2dbc"
+//include "spring-test_demo"
 include "spring-test"
 include "spring-tx"
 include "spring-web"

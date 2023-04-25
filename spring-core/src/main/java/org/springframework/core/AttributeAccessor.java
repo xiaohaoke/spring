@@ -22,6 +22,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 用于获取元数据，在实现类中通过 LinkedHashMap 集合保存元数据
+ * ，例如通过 XML 的 <meta /> 标签定义的一些元信息会保存在其中
  * Interface defining a generic contract for attaching and accessing metadata
  * to/from arbitrary objects.
  *

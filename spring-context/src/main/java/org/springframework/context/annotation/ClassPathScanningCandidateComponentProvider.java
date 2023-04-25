@@ -94,22 +94,41 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
 
+	/**
+	 * 包含的过滤器
+	 */
 	private final List<TypeFilter> includeFilters = new ArrayList<>();
 
+	/**
+	 * 排除过滤器
+	 */
 	private final List<TypeFilter> excludeFilters = new ArrayList<>();
 
 	@Nullable
 	private Environment environment;
 
+	/**
+	 * 注解计算器
+	 */
 	@Nullable
 	private ConditionEvaluator conditionEvaluator;
 
+
+	/**
+	 * 资源加载器，默认 PathMatchingResourcePatternResolver
+	 */
 	@Nullable
 	private ResourcePatternResolver resourcePatternResolver;
 
+	/**
+	 * MetadataReader 工厂
+	 */
 	@Nullable
 	private MetadataReaderFactory metadataReaderFactory;
 
+	/**
+	 * 所有 `META-INF/spring.components` 文件的内容
+	 */
 	@Nullable
 	private CandidateComponentsIndex componentsIndex;
 
@@ -204,6 +223,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
+		// 添加 @Component 注解的过滤器（具有层次性），@Component 的派生注解都符合条件
 		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
 		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
 		try {
@@ -264,6 +284,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	public void setResourceLoader(@Nullable ResourceLoader resourceLoader) {
 		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
 		this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
+		//获取所有`META-INF/spring.components` 文件中的内容
 		this.componentsIndex = CandidateComponentsIndexLoader.loadIndex(this.resourcePatternResolver.getClassLoader());
 	}
 
@@ -416,6 +437,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
+			//对于模糊文件的寻找
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
@@ -426,10 +448,13 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 					logger.trace("Scanning " + resource);
 				}
 				try {
+					//这里就是过滤器发挥作用的地方，符合条件的才会生成beanDefinition
 					MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
 					if (isCandidateComponent(metadataReader)) {
 						ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 						sbd.setSource(resource);
+						//这里主要判断一下我们匹配到的类是不是一个符合条件的bean
+						//比如如果说我们注解打在接口上，这里就不会把这个BeanDefinition加入返回的容器中
 						if (isCandidateComponent(sbd)) {
 							if (debugEnabled) {
 								logger.debug("Identified candidate component class: " + resource);
@@ -479,19 +504,28 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	/**
+	 * 过滤器判断是否是我们关注的类，逻辑很直观
 	 * Determine whether the given class does not match any exclude filter
 	 * and does match at least one include filter.
 	 * @param metadataReader the ASM ClassReader for the class
 	 * @return whether the class qualifies as a candidate component
 	 */
 	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
+		//先判断的excludeFilters
 		for (TypeFilter tf : this.excludeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return false;
 			}
 		}
+		//再判断的includeFilters
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
+				// 如果是我们关注的类，还需要处理类上面的@Conditional注解
+				// 这里不继续往下拓展了，我简单讲一下逻辑：
+				// 	1.找到类上面所有的@Conditional簇的注解
+				//  2.实例化所有对应的Conditional类，并排序
+				//  3.依次调用所有condition.matches()，所有条件全部满足才返回true
+				// 具体细节同学们感兴趣可以自己看下
 				return isConditionMatch(metadataReader);
 			}
 		}
@@ -513,6 +547,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	/**
+	 * 判断是不是接口
 	 * Determine whether the given bean definition qualifies as candidate.
 	 * <p>The default implementation checks whether the class is not an interface
 	 * and not dependent on an enclosing class.
@@ -524,6 +559,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		AnnotationMetadata metadata = beanDefinition.getMetadata();
 		return (metadata.isIndependent() && (metadata.isConcrete() ||
 				(metadata.isAbstract() && metadata.hasAnnotatedMethods(Lookup.class.getName()))));
+		// 是抽象类但是有些方法被@Lookup注解标记，这个之前有稍微提过，xml标签里那个lookup-method标签跟这个是一个意思，相当于把这个方法委托/代理给另一个bean了，所以即使是抽象类也是可以变成一个bean的 -> spring动态代理生成一个子类
 	}
 
 

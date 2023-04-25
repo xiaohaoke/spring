@@ -1,6 +1,6 @@
 package annotation;
 
-import org.springframework.core.testfixture.stereotype.Component;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserService {

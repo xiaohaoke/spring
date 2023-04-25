@@ -443,7 +443,11 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 	/**
-	 * 调用 initInterceptors() 方法，将 interceptors 初始化成 HandlerInterceptor 类型，添加到 adaptedInterceptors 中
+	 * 在父类 WebApplicationObjectSupport 的父类 ApplicationObjectSupport 中可以看到，因为实现了 ApplicationContextAware 接口，则在初始化该 Bean 的时候会调用
+	 * setApplicationContext(@Nullable ApplicationContext context) 方法，
+	 * 在这个方法中会调用 initApplicationContext() 这个方法
+	 *
+	 * 初始化拦截器，调用 initInterceptors() 方法，将 interceptors 初始化成 HandlerInterceptor 类型，添加到 adaptedInterceptors 中
 	 * Initialize the specified interceptors adapting
 	 * {@link WebRequestInterceptor}s to {@link HandlerInterceptor}.
 	 * @see #setInterceptors

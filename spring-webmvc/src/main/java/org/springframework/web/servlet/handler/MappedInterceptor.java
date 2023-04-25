@@ -37,6 +37,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 import org.springframework.web.util.pattern.PatternParseException;
 
 /**
+ * 实现 HandlerInterceptor 接口，支持地址匹配的 HandlerInterceptor 实现类
  * Wraps a {@link HandlerInterceptor} and uses URL patterns to determine whether
  * it applies to a given request.
  *
@@ -63,15 +64,24 @@ public final class MappedInterceptor implements HandlerInterceptor {
 
 	private static PathMatcher defaultPathMatcher = new AntPathMatcher();
 
-
+	/**
+	 * 匹配的路径
+	 */
 	@Nullable
 	private final PatternAdapter[] includePatterns;
 
+	/**
+	 * 不匹配的路径
+	 */
 	@Nullable
 	private final PatternAdapter[] excludePatterns;
 
 	private PathMatcher pathMatcher = defaultPathMatcher;
 
+
+	/**
+	 * 拦截器对象
+	 */
 	private final HandlerInterceptor interceptor;
 
 
@@ -217,6 +227,7 @@ public final class MappedInterceptor implements HandlerInterceptor {
 	@Deprecated
 	public boolean matches(String lookupPath, PathMatcher pathMatcher) {
 		pathMatcher = (this.pathMatcher != defaultPathMatcher ? this.pathMatcher : pathMatcher);
+		//// <1> 先判断该路径是否在不匹配的路径中
 		if (!ObjectUtils.isEmpty(this.excludePatterns)) {
 			for (PatternAdapter adapter : this.excludePatterns) {
 				if (pathMatcher.match(adapter.getPatternString(), lookupPath)) {
@@ -224,9 +235,11 @@ public final class MappedInterceptor implements HandlerInterceptor {
 				}
 			}
 		}
+		// <2> 如果匹配的路径为空，则都匹配通过
 		if (ObjectUtils.isEmpty(this.includePatterns)) {
 			return true;
 		}
+		// <3> 判断路径是否在需要匹配的路径中
 		for (PatternAdapter adapter : this.includePatterns) {
 			if (pathMatcher.match(adapter.getPatternString(), lookupPath)) {
 				return true;

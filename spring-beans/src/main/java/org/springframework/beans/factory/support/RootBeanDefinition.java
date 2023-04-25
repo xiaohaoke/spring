@@ -35,6 +35,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 继承 AbstractBeanDefinition 抽象类，表示合并后的 BeanDefinition 对象。
+ * 在 Spring BeanFactory 初始化 Bean 的前阶段，
+ * 会根据 BeanDefinition 生成一个 RootBeanDefinition（具有层次性则会进行合并），用于后续实例化和初始化
  * A root bean definition represents the merged bean definition that backs
  * a specific bean in a Spring BeanFactory at runtime. It might have been created
  * from multiple original bean definitions that inherit from each other,

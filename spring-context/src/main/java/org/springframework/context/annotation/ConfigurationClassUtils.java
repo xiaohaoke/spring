@@ -75,6 +75,7 @@ abstract class ConfigurationClassUtils {
 
 
 	/**
+	 * 判断BeanDefinition是否是一个配置类
 	 * Check whether the given bean definition is a candidate for a configuration class
 	 * (or a nested component class declared within a configuration/component class,
 	 * to be auto-registered as well), and mark it accordingly.
@@ -86,10 +87,12 @@ abstract class ConfigurationClassUtils {
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 
 		String className = beanDef.getBeanClassName();
+		// 首先如果这个bean是通过factoryMethod来注册的，那它就不是一个配置类
 		if (className == null || beanDef.getFactoryMethodName() != null) {
 			return false;
 		}
-
+		//获取类上的所有注解的信息
+		//获取类上@Configuration注解的属性
 		AnnotationMetadata metadata;
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
@@ -123,10 +126,16 @@ abstract class ConfigurationClassUtils {
 		}
 
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+		// 有@Configuration注解且注解的proxyBeanMethods=true(这个是默认值)
+		// 这里解释一下这个proxyBeanMethods属性，这个属性我之前也没有注意，看注解是说如果这个属性为true
+		// 则这个配置类里被@Bean注解修饰的方法会被spring代理，使我们通过方法调用的时候获取到的实例也是属于spring管理的。
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
+			// 注意这里在beanDefinition中塞入了CONFIGURATION_CLASS_ATTRIBUTE这个属性
+			// 外面是通过判断这个是否有属性来确定某个beanDefinition是否是配置类
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
 		else if (config != null || isConfigurationCandidate(metadata)) {
+			// 有@Configuration 或者 isConfigurationCandidate(metadata)
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {
@@ -134,6 +143,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
+		// 获取排序值
 		Integer order = getOrder(metadata);
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
@@ -156,6 +166,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// Any of the typical annotations found?
+		//类上是否有被candidateIndicators列表中任一注解修饰？
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
 				return true;
@@ -168,6 +179,7 @@ abstract class ConfigurationClassUtils {
 
 	static boolean hasBeanMethods(AnnotationMetadata metadata) {
 		try {
+			//类中是否包含@Bean注解修饰的方法
 			return metadata.hasAnnotatedMethods(Bean.class.getName());
 		}
 		catch (Throwable ex) {

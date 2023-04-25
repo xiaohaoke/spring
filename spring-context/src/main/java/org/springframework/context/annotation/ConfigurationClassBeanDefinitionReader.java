@@ -386,6 +386,8 @@ class ConfigurationClassBeanDefinitionReader {
 
 
 	/**
+	 * 私有静态类，继承 RootBeanDefinition，实现了 AnnotatedBeanDefinition 接口，
+	 * 和 AnnotatedGenericBeanDefinition 类似，没有继承关系，通过 @Bean 定义的方法会解析成该对象
 	 * {@link RootBeanDefinition} marker subclass used to signify that a bean definition
 	 * was created from a configuration class as opposed to any other configuration source.
 	 * Used in bean overriding cases where it's necessary to determine whether the bean

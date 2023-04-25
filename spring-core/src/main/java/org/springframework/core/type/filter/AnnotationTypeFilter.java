@@ -73,9 +73,9 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 
 	/**
 	 * Create a new {@code AnnotationTypeFilter} for the given annotation type.
-	 * @param annotationType the annotation type to match
-	 * @param considerMetaAnnotations whether to also match on meta-annotations
-	 * @param considerInterfaces whether to also match interfaces
+	 * @param annotationType the annotation type to match 注解类型
+	 * @param considerMetaAnnotations whether to also match on meta-annotations 是否考虑源注解
+	 * @param considerInterfaces whether to also match interfaces 第一个参数是否考虑继承的注解
 	 */
 	public AnnotationTypeFilter(
 			Class<? extends Annotation> annotationType, boolean considerMetaAnnotations, boolean considerInterfaces) {
@@ -97,7 +97,9 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 	@Override
 	protected boolean matchSelf(MetadataReader metadataReader) {
 		AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
+		//类上有目标注解
 		return metadata.hasAnnotation(this.annotationType.getName()) ||
+				//如果从源注解拿，则找一下上面有没有元注解和目标注解一样的
 				(this.considerMetaAnnotations && metadata.hasMetaAnnotation(this.annotationType.getName()));
 	}
 
@@ -118,6 +120,8 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 		if (Object.class.getName().equals(typeName)) {
 			return false;
 		}
+		// 这个父类和接口的匹配逻辑居然只能匹配到jdk内置（java开头）的类
+		// 看来默认的实现应该是用来支持JSR标准的那些注解的
 		else if (typeName.startsWith("java")) {
 			if (!this.annotationType.getName().startsWith("java")) {
 				// Standard Java types do not have non-standard annotations on them ->

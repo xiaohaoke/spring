@@ -45,18 +45,21 @@ import org.springframework.lang.Nullable;
 public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 
 	/**
+	 * 保存标签名-解析器对应关系的容器
 	 * Stores the {@link BeanDefinitionParser} implementations keyed by the
 	 * local name of the {@link Element Elements} they handle.
 	 */
 	private final Map<String, BeanDefinitionParser> parsers = new HashMap<>();
 
 	/**
+	 * 保存标签名-装饰器相关的容器
 	 * Stores the {@link BeanDefinitionDecorator} implementations keyed by the
 	 * local name of the {@link Element Elements} they handle.
 	 */
 	private final Map<String, BeanDefinitionDecorator> decorators = new HashMap<>();
 
 	/**
+	 * 保存属性名-装饰器对应的容器
 	 * Stores the {@link BeanDefinitionDecorator} implementations keyed by the local
 	 * name of the {@link Attr Attrs} they handle.
 	 */
@@ -70,8 +73,9 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	@Override
 	@Nullable
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		//获取Parser
 		BeanDefinitionParser parser = findParserForElement(element, parserContext);
-		//调用parse()
+		//调用parse(),委托给Parser解析
 		return (parser != null ? parser.parse(element, parserContext) : null);
 	}
 
@@ -82,8 +86,10 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	@Nullable
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
 		//获取localName
+		//这里去掉了标签中去掉前缀的名称context:component-scan --> component-scan
 		String localName = parserContext.getDelegate().getLocalName(element);
 		//获取BeanDefinitionParser对象
+		//从map中获取到对应的parser
 		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(

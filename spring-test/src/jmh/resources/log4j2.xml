@@ -7,4 +7,12 @@
 		</Console>
 	</Appenders>
 
+	<Loggers>
+		<Logger name="org.springframework.beans" level="debug" />
+		<logger name="org.springframework.*" level="debug" />
+		<Root level="error">
+			<AppenderRef ref="Console" />
+		</Root>
+	</Loggers>
+
 </Configuration>

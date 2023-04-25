@@ -26,6 +26,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * BeanDefinition的解析过程中的工具类
  * Utility methods that are useful for bean definition reader implementations.
  * Mainly intended for internal use.
  *

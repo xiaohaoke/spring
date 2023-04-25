@@ -26,6 +26,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 继承 GenericBeanDefinition，实现 AnnotatedBeanDefinition 接口，多了一个 AnnotationMetadata 注解类元信息对象，
+ * 例如通过 @Component 注解定义的 Bean 会解析成该对象
  * Extension of the {@link org.springframework.beans.factory.support.GenericBeanDefinition}
  * class, based on an ASM ClassReader, with support for annotation metadata exposed
  * through the {@link AnnotatedBeanDefinition} interface.

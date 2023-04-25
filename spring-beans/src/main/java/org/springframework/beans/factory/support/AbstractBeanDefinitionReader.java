@@ -35,6 +35,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 提供通用的实现，具体资源加载逻辑由子类实现
  * Abstract base class for bean definition readers which implement
  * the {@link BeanDefinitionReader} interface.
  *
@@ -208,6 +209,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
+		//获得ResourceLoader对象
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
@@ -217,9 +219,12 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
 			try {
+				// 获得 Resource 数组，因为 Pattern 模式匹配下，可能有多个 Resource 。例如说，Ant 风格的 location
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+				// 加载 BeanDefinition 们
 				int count = loadBeanDefinitions(resources);
 				if (actualResources != null) {
+					// 添加到 actualResources 中
 					Collections.addAll(actualResources, resources);
 				}
 				if (logger.isTraceEnabled()) {
@@ -234,9 +239,12 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		}
 		else {
 			// Can only load single resources by absolute URL.
+			// 获得 Resource 对象
 			Resource resource = resourceLoader.getResource(location);
+			// 加载 BeanDefinition 们
 			int count = loadBeanDefinitions(resource);
 			if (actualResources != null) {
+				// 添加到 actualResources 中
 				actualResources.add(resource);
 			}
 			if (logger.isTraceEnabled()) {

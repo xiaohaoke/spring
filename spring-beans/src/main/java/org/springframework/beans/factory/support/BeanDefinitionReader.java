@@ -22,6 +22,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 
 /**
+ * BeanDefinition 读取器
  * Simple interface for bean definition readers that specifies load methods with
  * {@link Resource} and {@link String} location parameters.
  *
@@ -40,6 +41,7 @@ import org.springframework.lang.Nullable;
 public interface BeanDefinitionReader {
 
 	/**
+	 * 返回BeanDefinition注册中心
 	 * Return the bean factory to register the bean definitions with.
 	 * <p>The factory is exposed through the {@link BeanDefinitionRegistry} interface,
 	 * encapsulating the methods that are relevant for bean definition handling.
@@ -47,6 +49,7 @@ public interface BeanDefinitionReader {
 	BeanDefinitionRegistry getRegistry();
 
 	/**
+	 * 返回 Resource 资源加载器，默认为 PathMatchingResourcePatternResolver
 	 * Return the {@link ResourceLoader} to use for resource locations.
 	 * <p>Can be checked for the {@code ResourcePatternResolver} interface and cast
 	 * accordingly, for loading multiple resources for a given resource pattern.
@@ -67,6 +70,7 @@ public interface BeanDefinitionReader {
 	ResourceLoader getResourceLoader();
 
 	/**
+	 * 返回类加载器
 	 * Return the class loader to use for bean classes.
 	 * <p>{@code null} suggests to not load bean classes eagerly
 	 * but rather to just register bean definitions with class names,
@@ -76,6 +80,7 @@ public interface BeanDefinitionReader {
 	ClassLoader getBeanClassLoader();
 
 	/**
+	 * 返回 Bean 的名称生成器，默认为 DefaultBeanNameGenerator
 	 * Return the {@link BeanNameGenerator} to use for anonymous beans
 	 * (without explicit bean name specified).
 	 */
@@ -83,6 +88,7 @@ public interface BeanDefinitionReader {
 
 
 	/**
+	 * 从 Resource 资源中加载 BeanDefinition 并返回数量
 	 * Load bean definitions from the specified resource.
 	 * @param resource the resource descriptor
 	 * @return the number of bean definitions found

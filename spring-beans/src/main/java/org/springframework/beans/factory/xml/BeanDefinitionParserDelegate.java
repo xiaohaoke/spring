@@ -418,20 +418,24 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		//<1> 计算 BeanDefinition 的 `beanName` 名称和 `aliases` 别名集合
 		//解析ID属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
 		//解析name属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		//分割name属性
 
+		// <1.2> 将 `name` 属性全部添加至别名集合
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
+		// <1.3> 设置 Bean 的名称，优先 `id` 属性，其次 `name` 属性
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
+			// 移除出别名集合
 			beanName = aliases.remove(0);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No XML 'id' specified - using '" + beanName +
@@ -442,14 +446,16 @@ public class BeanDefinitionParserDelegate {
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
+		// <2> 解析 `<bean />` 标签相关属性，构造出一个 GenericBeanDefinition 对象
 		//解析 属性 构造 AbstractBeanDefinition
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		//如果解析成功，则说明当前的默认属性已经解析完毕
 		if (beanDefinition != null) {
+			// <3> 如果不存在 `beanName`，则根据 Class 对象的名称生成一个
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
-
+						// <3.1> 生成唯一的 `beanName`
 						beanName = BeanDefinitionReaderUtils.generateBeanName(
 								beanDefinition, this.readerContext.getRegistry(), true);
 					}
@@ -476,6 +482,7 @@ public class BeanDefinitionParserDelegate {
 					return null;
 				}
 			}
+			// <4> 创建 BeanDefinitionHolder 对象，设置 `beanName` 名称和 `aliases` 别名集合，返回
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
 			//封装BeanDefinitionHolder
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
@@ -516,7 +523,7 @@ public class BeanDefinitionParserDelegate {
 			Element ele, String beanName, @Nullable BeanDefinition containingBean) {
 
 		this.parseState.push(new BeanEntry(beanName));
-
+		// <1> 获取 `class` 和 `parent` 属性
 		String className = null;
 		//解析class属性
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
@@ -531,11 +538,13 @@ public class BeanDefinitionParserDelegate {
 		try {
 			//创建用于承载属性的GenericBeanDefinition 实例
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-			//解析默认bean的各种属性
+			//解析默认bean的各种属性,并赋值
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			//提取description
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 			//解析元数据
+			//<4> 解析 `<bean />` 的子标签，生成的对象设置到 `bd` 中
+			//<4.1> 解析 `<meta />` 元数据标签
 			parseMetaElements(ele, bd);
 			//解析lookup-method,Spring 动态改变 bean 里方法的实现。
 			// 方法执行返回的对象，使用 Spring 内原有的这类对象替换，通过改变方法返回值来动态改变方法。
@@ -549,8 +558,9 @@ public class BeanDefinitionParserDelegate {
 			parsePropertyElements(ele, bd);
 			// 解析 qualifier 子元素
 			parseQualifierElements(ele, bd);
-
+			//设置Bean的resource资源为XML文件资源
 			bd.setResource(this.readerContext.getResource());
+			//设置 Bean 的 `source` 来源为 `<bean />` 标签对象
 			bd.setSource(extractSource(ele));
 
 			return bd;
@@ -1426,18 +1436,20 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
-		//获取namespaceUri
+		//获取namespaceUri,即配置文件头部beans标签里面那些xmlns:xxx=www.xxx.com
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
 			return null;
 		}
 		//根据nameSpaceUri获取相应的Handler
+		//获取自定义标签对应的namespaceHandler,从这里我们可以看到。对于每一个nameSpaceUro应该都有唯一对应的nameSpaceHandler
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
 		//调用自定义的Handler处理
+		//把自定义标签委托给对应的NameSpaceHandler解析
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 

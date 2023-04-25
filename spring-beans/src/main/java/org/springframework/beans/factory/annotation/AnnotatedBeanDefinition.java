@@ -22,6 +22,8 @@ import org.springframework.core.type.MethodMetadata;
 import org.springframework.lang.Nullable;
 
 /**
+ * 继承 BeanDefinition 接口，定义注解类的元信息，
+ * 例如通过 @Component 注解定义的 Bean，那么注解类的元信息会包含编译后的 .class 文件的所有信息
  * Extended {@link org.springframework.beans.factory.config.BeanDefinition}
  * interface that exposes {@link org.springframework.core.type.AnnotationMetadata}
  * about its bean class - without requiring the class to be loaded yet.
